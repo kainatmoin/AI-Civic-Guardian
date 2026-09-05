@@ -642,7 +642,11 @@ Project:
 
 **AI Civic Guardian**
 
-AI-powered civic issue reporting for safer and smarter communities.
+## 👥 Team Members
+
+- Kainat Moin
+- Hafsa Naz
+- Saira Jabeen
 
 ---
 
