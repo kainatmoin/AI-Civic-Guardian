@@ -1,0 +1,102 @@
+# =========================
+# PYTHON
+# =========================
+
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+venv/
+.venv/
+env/
+ENV/
+
+.pytest_cache/
+.mypy_cache/
+
+
+# =========================
+# SECRETS / ENVIRONMENT
+# =========================
+
+.env
+.env.*
+!.env.example
+
+
+# =========================
+# DATABASE
+# =========================
+
+*.db
+*.sqlite
+*.sqlite3
+
+
+# =========================
+# UPLOADS
+# =========================
+
+uploads/
+backend/uploads/
+frontend/uploads/
+
+
+# =========================
+# TRAINING OUTPUTS
+# =========================
+
+runs/
+backend/runs/
+
+
+# =========================
+# AI MODEL WEIGHTS
+# =========================
+
+*.pt
+*.onnx
+*.engine
+
+
+# =========================
+# BACKUP FILES
+# =========================
+
+*_backup.py
+*_backup.pt
+
+
+# =========================
+# DATASETS
+# =========================
+
+dataset/
+datasets/
+CivicGuardian_Final/
+*.zip
+
+
+# =========================
+# LOCAL DATASET SCRIPTS
+# =========================
+
+backend/merge_datasets.py
+
+
+# =========================
+# IDE
+# =========================
+
+.vscode/
+.idea/
+
+
+# =========================
+# WINDOWS / OS
+# =========================
+
+Thumbs.db
+Desktop.ini
+.DS_Store

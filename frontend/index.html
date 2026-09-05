@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Civic Guardian</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0b0d08;
+            color: #e8eadf;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 700px;
+            margin: 50px auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .header h1 {
+            color: #a8b86b;
+            margin-bottom: 10px;
+            font-size: 38px;
+        }
+
+        .header p {
+            color: #9da18f;
+            font-size: 16px;
+        }
+
+        .card {
+            background: #151810;
+            border: 1px solid #303622;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #cbd39c;
+            font-weight: bold;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            resize: vertical;
+            background: #0d100b;
+            border: 1px solid #3a4229;
+            border-radius: 8px;
+            padding: 12px;
+            color: white;
+            font-size: 15px;
+            outline: none;
+        }
+
+        textarea:focus {
+            border-color: #87994e;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            background: #0d100b;
+            border: 1px solid #3a4229;
+            border-radius: 8px;
+            color: #cfd3c2;
+        }
+
+        .photo-preview {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .photo-preview img {
+            max-width: 100%;
+            max-height: 350px;
+            border-radius: 10px;
+            border: 1px solid #3a4229;
+            display: none;
+        }
+
+        .analyze-btn,
+        .location-btn,
+        .submit-btn {
+            width: 100%;
+            border: none;
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .analyze-btn {
+            background: #65752f;
+            color: white;
+        }
+
+        .analyze-btn:hover {
+            background: #788b38;
+        }
+
+        .analyze-btn:disabled {
+            background: #3d4525;
+            cursor: not-allowed;
+        }
+
+        .location-btn {
+            background: #303722;
+            color: #d9dfb6;
+            border: 1px solid #59643a;
+        }
+
+        .location-btn:hover {
+            background: #3b4529;
+        }
+
+        .submit-btn {
+            background: #87994e;
+            color: #101208;
+            font-size: 17px;
+        }
+
+        .submit-btn:hover {
+            background: #9dad60;
+        }
+
+        .submit-btn:disabled {
+            background: #3d422e;
+            color: #858979;
+            cursor: not-allowed;
+        }
+
+        .ai-result {
+            display: none;
+            margin-top: 18px;
+            padding: 18px;
+            border-radius: 10px;
+            background: #202618;
+            border: 1px solid #65752f;
+        }
+
+        .ai-result h3 {
+            margin-top: 0;
+            color: #a8b86b;
+        }
+
+        .detected-issue {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            margin: 8px 0;
+        }
+
+        .confidence {
+            color: #b9bea9;
+        }
+
+        .gps-status {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #0d100b;
+            border: 1px solid #303622;
+            color: #aeb39d;
+            font-size: 14px;
+        }
+
+        .result {
+            display: none;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            background: #202618;
+            border: 1px solid #65752f;
+        }
+
+        .success {
+            color: #b9d66d;
+        }
+
+        .error {
+            color: #e28d8d;
+        }
+
+        .small-note {
+            margin-top: 8px;
+            font-size: 13px;
+            color: #858a77;
+        }
+
+        .required {
+            color: #a8b86b;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>AI Civic Guardian</h1>
+        <p>Report civic issues with AI-powered detection</p>
+    </div>
+
+
+    <!-- PHOTO + AI DETECTION -->
+    <div class="card">
+
+        <label for="photo">
+            📷 Upload Civic Issue Photo <span class="required">*</span>
+        </label>
+
+        <input
+            type="file"
+            id="photo"
+            accept="image/*"
+            onchange="previewPhoto()"
+        >
+
+        <div class="photo-preview">
+            <img id="preview" alt="Selected photo preview">
+        </div>
+
+        <button
+            type="button"
+            class="analyze-btn"
+            id="analyzeButton"
+            onclick="analyzePhoto()"
+        >
+            🤖 Analyze Photo with AI
+        </button>
+
+        <div class="small-note">
+            AI can detect potholes, cracks, open manholes, fallen trees,
+            garbage, streetlights and water leaks.
+        </div>
+
+
+        <!-- AI RESULT -->
+        <div class="ai-result" id="aiResult">
+
+            <h3>🤖 AI Detection Result</h3>
+
+            <div class="detected-issue" id="detectedIssue">
+                —
+            </div>
+
+            <div class="confidence" id="confidence">
+                Confidence: —
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- DESCRIPTION -->
+    <div class="card">
+
+        <label for="description">
+            📝 Description <span class="required">*</span>
+        </label>
+
+        <textarea
+            id="description"
+            placeholder="Describe the issue or add any useful details..."
+        ></textarea>
+
+    </div>
+
+
+    <!-- GPS -->
+    <div class="card">
+
+        <label>
+            📍 Location <span class="required">*</span>
+        </label>
+
+        <button
+            type="button"
+            class="location-btn"
+            onclick="getLocation()"
+        >
+            📍 Capture My Location
+        </button>
+
+        <div class="gps-status" id="gpsStatus">
+            Location not captured yet.
+        </div>
+
+        <input type="hidden" id="latitude">
+        <input type="hidden" id="longitude">
+
+    </div>
+
+
+    <!-- SUBMIT -->
+    <div class="card">
+
+        <button
+            type="button"
+            class="submit-btn"
+            id="submitButton"
+            onclick="submitReport()"
+        >
+            🚨 Submit Report
+        </button>
+
+        <div class="result" id="result"></div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    const API_URL = "http://127.0.0.1:8000";
+
+    let selectedPhoto = null;
+    let detectedIssue = null;
+
+
+    // =========================
+    // ISSUE DISPLAY NAMES
+    // =========================
+
+    const issueNames = {
+        "pothole": "Pothole",
+        "cracks": "Road Cracks",
+        "open_manhole": "Open Manhole",
+        "fallen_tree": "Fallen Tree",
+        "garbage": "Garbage",
+        "streetlight": "Broken Streetlight",
+        "water_leak": "Water Leakage"
+    };
+
+
+    // =========================
+    // PHOTO PREVIEW
+    // =========================
+
+    function previewPhoto() {
+
+        const photoInput = document.getElementById("photo");
+        const preview = document.getElementById("preview");
+        const aiResult = document.getElementById("aiResult");
+
+        selectedPhoto = photoInput.files[0];
+
+        // Clear previous AI result
+        detectedIssue = null;
+
+        aiResult.style.display = "none";
+
+        if (!selectedPhoto) {
+
+            preview.style.display = "none";
+
+            return;
+        }
+
+
+        // Show preview
+        const reader = new FileReader();
+
+        reader.onload = function(event) {
+
+            preview.src = event.target.result;
+            preview.style.display = "block";
+
+        };
+
+        reader.readAsDataURL(selectedPhoto);
+    }
+
+
+    // =========================
+    // AI PHOTO ANALYSIS
+    // =========================
+
+    async function analyzePhoto() {
+
+        const photoInput = document.getElementById("photo");
+        const analyzeButton = document.getElementById("analyzeButton");
+        const aiResult = document.getElementById("aiResult");
+        const detectedIssueElement = document.getElementById("detectedIssue");
+        const confidenceElement = document.getElementById("confidence");
+        const result = document.getElementById("result");
+
+
+        if (!photoInput.files.length) {
+
+            showResult(
+                "Please select a photo first.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        const photo = photoInput.files[0];
+
+        const formData = new FormData();
+
+        formData.append("photo", photo);
+
+
+        // Button state
+        analyzeButton.disabled = true;
+        analyzeButton.innerText = "🤖 Analyzing...";
+
+
+        aiResult.style.display = "none";
+
+        result.style.display = "none";
+
+
+        try {
+
+            const response = await fetch(
+                `${API_URL}/detect`,
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "AI server returned an error."
+                );
+            }
+
+
+            const data = await response.json();
+
+
+            if (
+                data.success &&
+                data.detected_issue
+            ) {
+
+                detectedIssue = data.detected_issue;
+
+                const displayName =
+                    issueNames[detectedIssue] ||
+                    detectedIssue;
+
+
+                const confidence =
+                    (data.confidence * 100).toFixed(1);
+
+
+                detectedIssueElement.innerText =
+                    displayName;
+
+
+                confidenceElement.innerText =
+                    `Confidence: ${confidence}%`;
+
+
+                aiResult.style.display = "block";
+
+
+                showResult(
+                    "AI successfully detected the civic issue.",
+                    "success"
+                );
+
+            } else {
+
+                detectedIssue = null;
+
+                aiResult.style.display = "none";
+
+
+                showResult(
+                    "AI could not detect a supported civic issue. Try another clearer photo.",
+                    "error"
+                );
+            }
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            detectedIssue = null;
+
+
+            showResult(
+                "Could not connect to the AI server. Make sure the backend is running.",
+                "error"
+            );
+
+        } finally {
+
+            analyzeButton.disabled = false;
+
+            analyzeButton.innerText =
+                "🤖 Analyze Photo with AI";
+        }
+    }
+
+
+    // =========================
+    // GPS LOCATION
+    // =========================
+
+    function getLocation() {
+
+        const gpsStatus =
+            document.getElementById("gpsStatus");
+
+
+        if (!navigator.geolocation) {
+
+            gpsStatus.innerText =
+                "Geolocation is not supported by this browser.";
+
+            return;
+        }
+
+
+        gpsStatus.innerText =
+            "📍 Getting your location...";
+
+
+        navigator.geolocation.getCurrentPosition(
+
+            function(position) {
+
+                const latitude =
+                    position.coords.latitude;
+
+                const longitude =
+                    position.coords.longitude;
+
+
+                document.getElementById("latitude").value =
+                    latitude;
+
+                document.getElementById("longitude").value =
+                    longitude;
+
+
+                gpsStatus.innerText =
+                    `Location captured: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+
+            },
+
+
+            function(error) {
+
+                console.error(error);
+
+                gpsStatus.innerText =
+                    "❌ Could not get location. Please allow location permission.";
+
+            },
+
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
+    }
+
+
+    // =========================
+    // SUBMIT REPORT
+    // =========================
+
+    async function submitReport() {
+
+        const photoInput =
+            document.getElementById("photo");
+
+        const description =
+            document.getElementById("description").value.trim();
+
+        const latitude =
+            document.getElementById("latitude").value;
+
+        const longitude =
+            document.getElementById("longitude").value;
+
+        const submitButton =
+            document.getElementById("submitButton");
+
+
+        // Validate AI detection
+        if (!detectedIssue) {
+
+            showResult(
+                "Please upload a photo and analyze it with AI first.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        // Validate description
+        if (!description) {
+
+            showResult(
+                "Please enter a description.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        // Validate photo
+        if (!photoInput.files.length) {
+
+            showResult(
+                "Please select a photo.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        // Validate GPS
+        if (!latitude || !longitude) {
+
+            showResult(
+                "Please capture your location first.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        const formData = new FormData();
+
+
+        // AI detected issue
+        formData.append(
+            "issue_type",
+            detectedIssue
+        );
+
+
+        formData.append(
+            "description",
+            description
+        );
+
+
+        formData.append(
+            "latitude",
+            latitude
+        );
+
+
+        formData.append(
+            "longitude",
+            longitude
+        );
+
+
+        formData.append(
+            "photo",
+            photoInput.files[0]
+        );
+
+
+        submitButton.disabled = true;
+
+        submitButton.innerText =
+            "🚨 Submitting...";
+
+
+        try {
+
+            const response = await fetch(
+                `${API_URL}/reports`,
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Report submission failed."
+                );
+            }
+
+
+            const data =
+                await response.json();
+
+
+            console.log(
+                "Report created:",
+                data
+            );
+
+
+            showResult(
+                `✅ Report submitted successfully! Report ID: ${data.report.id}`,
+                "success"
+            );
+
+
+            // Reset form
+            photoInput.value = "";
+
+            document.getElementById("description").value = "";
+
+            document.getElementById("latitude").value = "";
+
+            document.getElementById("longitude").value = "";
+
+            document.getElementById("preview").style.display =
+                "none";
+
+            document.getElementById("aiResult").style.display =
+                "none";
+
+            document.getElementById("gpsStatus").innerText =
+                "Location not captured yet.";
+
+            detectedIssue = null;
+
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            showResult(
+                "❌ Could not submit the report. Make sure the backend is running.",
+                "error"
+            );
+
+        } finally {
+
+            submitButton.disabled = false;
+
+            submitButton.innerText =
+                "🚨 Submit Report";
+        }
+    }
+
+
+    // =========================
+    // RESULT MESSAGE
+    // =========================
+
+    function showResult(message, type) {
+
+        const result =
+            document.getElementById("result");
+
+
+        result.innerText = message;
+
+        result.className =
+            `result ${type}`;
+
+        result.style.display =
+            "block";
+    }
+
+</script>
+
+</body>
+</html>
