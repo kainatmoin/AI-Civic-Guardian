@@ -51,8 +51,6 @@ app.add_middleware(
 # AI MODEL
 # =========================================================
 
-# Model can be overridden using an environment variable.
-# Default location is backend/models/civic_guardian.pt
 MODEL_PATH = os.getenv(
     "MODEL_PATH",
     os.path.join(
@@ -62,14 +60,10 @@ MODEL_PATH = os.getenv(
     )
 )
 
-
-# Check model file before loading
 if not os.path.exists(MODEL_PATH):
-
     raise FileNotFoundError(
         f"AI model not found at: {MODEL_PATH}"
     )
-
 
 model = YOLO(MODEL_PATH)
 
@@ -83,7 +77,6 @@ UPLOAD_FOLDER = os.path.join(
     "uploads"
 )
 
-
 os.makedirs(
     UPLOAD_FOLDER,
     exist_ok=True
@@ -95,15 +88,11 @@ os.makedirs(
 # =========================================================
 
 def get_db():
-
     db = SessionLocal()
 
     try:
-
         yield db
-
     finally:
-
         db.close()
 
 
@@ -112,8 +101,9 @@ def get_db():
 # =========================================================
 
 @app.get("/")
+@app.get("/api")
+@app.get("/api/")
 def root():
-
     return {
         "message": "AI Civic Guardian API is running",
         "status": "success"
@@ -121,8 +111,8 @@ def root():
 
 
 @app.get("/health")
+@app.get("/api/health")
 def health():
-
     return {
         "status": "healthy",
         "model": "loaded"
@@ -134,6 +124,7 @@ def health():
 # =========================================================
 
 @app.post("/detect")
+@app.post("/api/detect")
 def detect_issue(
     photo: UploadFile = File(...)
 ):
@@ -147,14 +138,11 @@ def detect_issue(
     )[1]
 
     if not file_extension:
-
         file_extension = ".jpg"
-
 
     temp_filename = (
         f"{uuid.uuid4()}{file_extension}"
     )
-
 
     temp_path = os.path.join(
         UPLOAD_FOLDER,
@@ -163,7 +151,7 @@ def detect_issue(
 
 
     # -----------------------------------------------------
-    # SAVE UPLOADED IMAGE
+    # SAVE TEMPORARY IMAGE
     # -----------------------------------------------------
 
     with open(
@@ -191,7 +179,6 @@ def detect_issue(
             verbose=False
         )
 
-
         detections = []
 
 
@@ -203,9 +190,7 @@ def detect_issue(
 
             boxes = result.boxes
 
-
             if boxes is None:
-
                 continue
 
 
@@ -215,11 +200,9 @@ def detect_issue(
                     box.cls[0]
                 )
 
-
                 confidence = float(
                     box.conf[0]
                 )
-
 
                 class_name = model.names[
                     class_id
@@ -244,7 +227,7 @@ def detect_issue(
 
 
                 # -----------------------------------------
-                # KEEP ONLY ACCEPTED DETECTIONS
+                # ACCEPT DETECTION
                 # -----------------------------------------
 
                 if confidence >= minimum_confidence:
@@ -261,7 +244,8 @@ def detect_issue(
 
 
         # =================================================
-        # KEEP HIGHEST CONFIDENCE PER CLASS
+        # REMOVE DUPLICATE CLASSES
+        # KEEP HIGHEST CONFIDENCE
         # =================================================
 
         best_by_class = {}
@@ -314,20 +298,16 @@ def detect_issue(
 
             best_detection = detections[0]
 
-
             return {
                 "success": True,
-
                 "detected_issue":
                     best_detection[
                         "issue_type"
                     ],
-
                 "confidence":
                     best_detection[
                         "confidence"
                     ],
-
                 "detections":
                     detections
             }
@@ -338,17 +318,11 @@ def detect_issue(
         # =================================================
 
         return {
-
             "success": True,
-
             "detected_issue": None,
-
             "confidence": 0,
-
             "detections": [],
-
-            "message":
-                "No civic issue detected"
+            "message": "No civic issue detected"
         }
 
 
@@ -368,6 +342,7 @@ def detect_issue(
 # =========================================================
 
 @app.post("/reports")
+@app.post("/api/reports")
 def create_report(
 
     issue_type: str = Form(...),
@@ -385,18 +360,20 @@ def create_report(
 ):
 
     # =====================================================
-    # PHOTO FILE NAME
+    # FILE EXTENSION
     # =====================================================
 
     file_extension = os.path.splitext(
         photo.filename or ""
     )[1]
 
-
     if not file_extension:
-
         file_extension = ".jpg"
 
+
+    # =====================================================
+    # UNIQUE PHOTO NAME
+    # =====================================================
 
     unique_filename = (
         f"{uuid.uuid4()}{file_extension}"
@@ -425,24 +402,19 @@ def create_report(
 
 
     # =====================================================
-    # CREATE DATABASE REPORT
+    # CREATE REPORT
     # =====================================================
 
     new_report = Report(
-
         issue_type=issue_type,
-
         description=description,
-
         latitude=latitude,
-
         longitude=longitude
-
     )
 
 
     # =====================================================
-    # SAVE REPORT
+    # SAVE DATABASE
     # =====================================================
 
     db.add(new_report)
@@ -457,7 +429,6 @@ def create_report(
     # =====================================================
 
     return {
-
         "message":
             "Report and photo saved successfully",
 
