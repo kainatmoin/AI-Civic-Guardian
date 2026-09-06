@@ -1,6 +1,6 @@
-streamlit>=1.40,<2
-ultralytics>=8.3,<9
-torch>=2.2,<3
-torchvision>=0.17,<1
-pillow>=10,<13
-streamlit-js-eval>=0.1.7,<2
+streamlit==1.63.0
+ultralytics-opencv-headless==8.4.139
+torch==2.14.0
+torchvision==0.29.0
+pillow==12.3.0
+streamlit-js-eval==0.1.7
