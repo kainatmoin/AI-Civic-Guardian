@@ -1,14 +1,26 @@
 # 🚨 AI Civic Guardian
 
-AI Civic Guardian is an AI-powered civic issue reporting platform designed to help citizens quickly report public infrastructure problems using **AI image detection, GPS location capture, and automated report generation**.
+AI Civic Guardian is an AI-powered civic issue reporting platform designed to help citizens quickly report public infrastructure problems using **AI image detection, GPS location capture, and structured report submission**.
 
-The platform aims to make civic issue reporting faster, simpler, and more structured by reducing the amount of manual information a citizen needs to provide.
+The platform makes civic issue reporting faster, simpler, and more structured by using computer vision to assist with identifying civic problems while capturing the user's location and description.
 
 ---
 
-## 🌍 Problem
+## 🌐 Live Demo
 
-Civic infrastructure problems are common in many communities and can create serious safety and accessibility issues.
+### 🚨 AI Civic Guardian — Live Application
+
+**https://ai-civic-guardian-kryjzuyolzphxv7feqhxy4.streamlit.app/**
+
+### 💻 GitHub Repository
+
+**https://github.com/kainatmoin/AI-Civic-Guardian**
+
+---
+
+# 🌍 Problem
+
+Civic infrastructure problems are common in many communities and can create serious safety, accessibility, and environmental concerns.
 
 Examples include:
 
@@ -20,7 +32,7 @@ Examples include:
 - 💡 Broken streetlights
 - 💧 Water leakage
 
-Traditional complaint systems often require citizens to manually describe the issue, identify its category, and provide location information.
+Traditional complaint systems often require citizens to manually identify the issue, describe the problem, choose a category, and provide location information.
 
 This can make reporting:
 
@@ -30,24 +42,25 @@ This can make reporting:
 - Difficult to structure
 - Difficult to analyze at scale
 
-AI Civic Guardian addresses this problem by using AI to automatically analyze the uploaded image and assist with identifying the civic issue.
+AI Civic Guardian addresses this problem by using AI-powered image detection to assist citizens in identifying civic infrastructure issues.
 
 ---
 
-## 💡 Solution
+# 💡 Solution
 
 AI Civic Guardian provides a simple citizen-first reporting workflow:
 
 1. 📷 Citizen uploads a photo of the civic issue.
-2. 🤖 AI analyzes the image.
-3. 🔍 AI identifies the detected issue.
-4. 📊 AI provides a confidence score.
-5. 📍 Browser captures the citizen's GPS location.
-6. 📝 Citizen adds a description.
-7. 🚨 Citizen submits the report.
-8. 🗄️ Backend stores the structured report in the database.
+2. 🤖 AI analyzes the image using a fine-tuned YOLO model.
+3. 🔍 The AI identifies the detected civic issue.
+4. 📊 The application displays the confidence score.
+5. 📍 The user clicks **Capture My Location** to obtain GPS coordinates.
+6. 📝 The citizen adds a description.
+7. 🚨 The citizen submits the report.
+8. 🆔 The system generates a report ID.
+9. 🗄️ Report information is stored in the application's database layer.
 
-This creates a more structured and AI-assisted civic reporting process.
+This creates a structured and AI-assisted civic reporting experience.
 
 ---
 
@@ -55,7 +68,7 @@ This creates a more structured and AI-assisted civic reporting process.
 
 ## 🤖 AI-Powered Issue Detection
 
-The system uses a fine-tuned YOLO object-detection model to analyze civic issue images.
+The application uses a fine-tuned YOLO object-detection model for civic issue recognition.
 
 Supported categories:
 
@@ -67,28 +80,44 @@ Supported categories:
 - Broken Streetlight
 - Water Leakage
 
-The AI returns the detected issue and its confidence score.
+The system displays:
 
-> **Note:** The current model is an MVP. Detection performance can vary across different real-world images and categories.
+- Detected issue
+- AI confidence score
+
+> **Note:** The current model is an MVP. Detection performance can vary depending on image quality, lighting, viewpoint, and civic issue category.
 
 ---
 
 ## 📷 Photo-Based Reporting
 
-Citizens can upload a photo of a civic issue directly from the browser.
+Citizens can upload a civic issue image directly from the web application.
 
-The image is sent to the AI detection backend for analysis.
+Supported image formats include:
+
+- JPG
+- JPEG
+- PNG
+- WEBP
+
+The uploaded image is analyzed by the AI model before report submission.
 
 ---
 
 ## 📍 GPS Location Capture
 
-The application uses the browser's Geolocation API to capture:
+The application uses browser-based geolocation to capture:
 
 - Latitude
 - Longitude
 
-The captured coordinates are attached to the civic report.
+Location capture is **user-triggered** through:
+
+```text
+📍 Capture My Location
+```
+
+The browser requests location permission before providing the coordinates.
 
 ---
 
@@ -98,21 +127,25 @@ Citizens can provide additional details about the reported problem.
 
 Example:
 
-> Large pothole near the main road entrance causing a safety hazard.
+> A large pothole near the main road entrance is creating a safety hazard for vehicles and pedestrians.
 
 ---
 
-## 🚨 Automated Report Submission
+## 🚨 Report Submission
 
-After AI analysis and GPS capture, the citizen can submit the report.
+A report can be submitted after:
 
-The backend stores the structured information in SQLite.
+- AI analysis
+- Description entry
+- GPS location capture
+
+The system generates a report ID after successful submission.
 
 ---
 
 ## 📊 AI Confidence
 
-The application displays the AI confidence score with the detected issue.
+The application displays the AI confidence associated with the detected issue.
 
 Example:
 
@@ -124,7 +157,7 @@ Confidence:
 65.3%
 ```
 
-The confidence score helps indicate how strongly the model supports its prediction.
+The confidence score indicates how strongly the model supports its prediction.
 
 ---
 
@@ -136,7 +169,7 @@ A pre-trained YOLO model was adapted for civic infrastructure issue detection.
 
 The final model supports seven civic issue categories.
 
-### AI Classes
+## AI Classes
 
 | ID | Class |
 |---|---|
@@ -148,38 +181,37 @@ The final model supports seven civic issue categories.
 | 5 | Streetlight |
 | 6 | Water Leakage |
 
-The model is integrated directly into the FastAPI backend.
+The trained model is loaded by the Streamlit application during inference.
 
 ---
 
 # 🏗️ System Architecture
 
 ```text
-                    CITIZEN
-                       │
-                       ▼
-                Upload Photo
-                       │
-                       ▼
-              AI Image Detection
-                       │
-                       ▼
-             Detected Issue + Confidence
-                       │
-                       ▼
-                Capture GPS
-                       │
-                       ▼
-             Add Description
-                       │
-                       ▼
-                Submit Report
-                       │
-                       ▼
-               FastAPI Backend
-                       │
-                       ▼
-                 SQLite Database
+                         CITIZEN
+                            │
+                            ▼
+                    Streamlit Web App
+                            │
+           ┌────────────────┼────────────────┐
+           │                │                │
+           ▼                ▼                ▼
+      Upload Photo     Capture GPS     Add Description
+           │                │                │
+           ▼                │                │
+        YOLO AI              │                │
+           │                │                │
+           ▼                │                │
+ Issue + Confidence          │                │
+           └────────────────┼────────────────┘
+                            ▼
+                     Submit Report
+                            │
+                            ▼
+                  Generate Report ID
+                            │
+                            ▼
+                    SQLite Storage
 ```
 
 ---
@@ -197,35 +229,26 @@ The model is integrated directly into the FastAPI backend.
            ↓
 5. Confidence score is displayed
            ↓
-6. Capture GPS location
+6. Click "Capture My Location"
            ↓
-7. Add issue description
+7. Allow browser location permission
            ↓
-8. Submit report
+8. Add issue description
            ↓
-9. Backend stores report
+9. Click "Submit Report"
+           ↓
+10. Receive Report ID
 ```
 
 ---
 
 # 🛠️ Technology Stack
 
-## Frontend
-
-- HTML5
-- CSS3
-- JavaScript
-- Browser File API
-- Browser Geolocation API
-
-## Backend
+## Application
 
 - Python
-- FastAPI
-- Uvicorn
-- SQLAlchemy
-- SQLite
-- Python Multipart
+- Streamlit
+- Streamlit JavaScript evaluation utilities
 
 ## Artificial Intelligence
 
@@ -234,12 +257,22 @@ The model is integrated directly into the FastAPI backend.
 - Transfer Learning
 - Fine-Tuned Object Detection
 
-## Development Tools
+## Computer Vision
+
+- OpenCV
+- Pillow
+
+## Data Storage
+
+- SQLite
+- Python `sqlite3`
+
+## Development & Deployment
 
 - Git
 - GitHub
 - Python Virtual Environment
-- FastAPI Swagger Documentation
+- Streamlit Community Cloud
 
 ---
 
@@ -252,14 +285,25 @@ AI-Civic-Guardian/
 │   ├── main.py
 │   ├── database.py
 │   ├── models.py
-│   └── schemas.py
+│   ├── schemas.py
+│   ├── models/
+│   │   └── civic_guardian.pt
+│   └── uploads/
 │
 ├── frontend/
 │   └── index.html
 │
+├── api/
+│   └── index.py
+│
+├── streamlit_app.py
+├── requirements.txt
+├── vercel.json
 ├── .gitignore
 └── README.md
 ```
+
+> The repository contains the original FastAPI/HTML implementation alongside the current Streamlit application used for the live demo.
 
 ---
 
@@ -276,13 +320,13 @@ cd AI-Civic-Guardian
 
 ## 2. Create a Virtual Environment
 
-Windows:
+### Windows
 
 ```cmd
 python -m venv venv
 ```
 
-Activate the environment:
+Activate:
 
 ```cmd
 venv\Scripts\activate
@@ -293,139 +337,106 @@ venv\Scripts\activate
 ## 3. Install Dependencies
 
 ```cmd
-pip install fastapi uvicorn python-multipart sqlalchemy ultralytics
+pip install -r requirements.txt
 ```
 
 ---
 
-# ▶️ Run the Backend
+# ▶️ Run the Application
 
-Go to the backend directory:
+From the project root:
 
 ```cmd
-cd backend
+streamlit run streamlit_app.py
 ```
 
-Start FastAPI:
-
-```cmd
-python -m uvicorn main:app --reload
-```
-
-The backend will run at:
+The application will open at:
 
 ```text
-http://127.0.0.1:8000
+http://localhost:8501
 ```
 
 ---
 
-# 📖 API Documentation
+# 🧪 Local Testing
 
-FastAPI automatically provides interactive API documentation.
-
-Open:
+Recommended testing flow:
 
 ```text
-http://127.0.0.1:8000/docs
-```
-
-Available API endpoints include:
-
-```text
-GET  /
-GET  /health
-POST /detect
-POST /reports
+Upload civic issue image
+        ↓
+Analyze Photo with AI
+        ↓
+Verify detected issue
+        ↓
+Verify confidence score
+        ↓
+Capture My Location
+        ↓
+Verify latitude + longitude
+        ↓
+Enter description
+        ↓
+Submit Report
+        ↓
+Verify Report ID
 ```
 
 ---
 
-# 📷 AI Detection API
+# 📷 AI Detection
 
-The frontend sends the uploaded image to:
+The application accepts common image formats such as:
 
-```text
-POST /detect
-```
+- JPG
+- JPEG
+- PNG
+- WEBP
 
-The AI analyzes the image and returns information similar to:
+The YOLO model analyzes the uploaded image and identifies supported civic issues.
+
+Example result:
 
 ```json
 {
-    "success": true,
-    "detected_issue": "pothole",
-    "confidence": 0.6532,
-    "detections": [
-        {
-            "issue_type": "pothole",
-            "confidence": 0.6532
-        }
-    ]
+  "success": true,
+  "detected_issue": "pothole",
+  "confidence": 0.6532
 }
 ```
 
----
-
-# 🚨 Report API
-
-After AI detection, GPS capture, and description entry, the frontend submits the report to:
-
-```text
-POST /reports
-```
-
-The report contains:
-
-- Issue type
-- Description
-- Latitude
-- Longitude
-- Photo
+The Streamlit interface converts the model output into a citizen-friendly result.
 
 ---
 
 # 📍 GPS Implementation
 
-The frontend uses the browser's built-in Geolocation API.
+The application uses browser-based geolocation.
 
-The user must allow location permission.
+The user explicitly clicks:
 
-The application captures:
+```text
+📍 Capture My Location
+```
+
+The browser then requests location permission.
+
+When successful, the application displays:
 
 ```text
 Latitude
 Longitude
 ```
 
-These values are sent to the FastAPI backend with the report.
+These coordinates are attached to the report.
+
+> Location availability depends on browser permission and device location capabilities.
 
 ---
 
-# 📷 Photo Upload
+# 🚨 Report Submission
 
-Citizens can select a civic issue photo from their device.
-
-The image is sent to the AI detection endpoint for analysis, and the detected issue is shown in the interface before report submission.
-
----
-
-# 📝 Report Creation
-
-After AI analysis and GPS capture, the citizen can submit a report.
-
-A successful submission returns a report ID and stores the report information in the database.
-
----
-
-# 🗄️ Database
-
-The current MVP uses:
-
-- SQLite
-- SQLAlchemy
-
-Each report stores structured information such as:
+A report combines the main information collected during the reporting workflow:
 
 ```text
 Report ID
@@ -434,48 +445,59 @@ Description
 Latitude
 Longitude
 Photo Filename
+Created At
 ```
 
-This provides a simple persistence layer for the MVP.
+After successful submission, the application displays the generated report ID.
+
+---
+
+# 🗄️ Database
+
+The MVP uses SQLite for lightweight report storage.
+
+The database provides a simple persistence layer for the prototype.
+
+For a larger production deployment, the database can later be migrated to a managed cloud database.
 
 ---
 
 # 🔐 Security and Repository Hygiene
 
-The repository uses `.gitignore` to prevent local development files from being committed.
+The repository uses `.gitignore` to reduce accidental commits of development-only files.
 
-Ignored files include:
+Typical ignored content includes:
 
 - Environment files
 - Local databases
 - Uploaded images
-- AI model weights
 - Training outputs
 - Dataset files
-- Backup files
-- Virtual environment files
+- Virtual environments
+- Temporary files
 
 No API keys, private credentials, or secrets should be committed to the repository.
+
+> Model weights required by the current demo are included so the deployed Streamlit application can load the AI model.
 
 ---
 
 # 🎯 Current MVP
 
-The current MVP focuses on the core reporting experience.
-
-### Implemented
+The current MVP implements the core civic reporting experience:
 
 - ✅ AI image analysis
 - ✅ Civic issue detection
 - ✅ AI confidence score
 - ✅ Photo upload
-- ✅ GPS location capture
+- ✅ User-triggered GPS location capture
 - ✅ Citizen description
 - ✅ Report submission
-- ✅ FastAPI backend
-- ✅ SQLite database
-- ✅ Frontend and backend integration
-- ✅ Interactive API documentation
+- ✅ Report ID generation
+- ✅ Streamlit web application
+- ✅ SQLite report storage
+- ✅ GitHub repository
+- ✅ Live Streamlit deployment
 
 ---
 
@@ -486,11 +508,11 @@ AI Civic Guardian can help communities create more structured civic issue report
 Potential benefits include:
 
 - Faster civic issue reporting
-- Less manual classification
-- Structured complaint information
-- Location-aware reports
+- Reduced manual classification
+- More structured complaint information
+- Location-aware reporting
 - Easier organization of civic infrastructure data
-- Better foundation for future civic analytics
+- A foundation for future civic analytics
 
 ---
 
@@ -531,7 +553,7 @@ Automatically estimate whether an issue is:
 
 ## 🏢 Department Routing
 
-Automatically route different issue types to appropriate departments.
+Automatically route different issue types to the appropriate department.
 
 Example:
 
@@ -570,6 +592,7 @@ Historical reports could be analyzed to identify:
 
 ```text
 Status: MVP Completed ✅
+Live Demo: Available ✅
 ```
 
 Core workflow:
@@ -581,22 +604,22 @@ AI Detection
    ↓
 Issue + Confidence
    ↓
-GPS
+GPS Capture
    ↓
 Description
    ↓
 Report Submission
    ↓
-Database
+Report ID
 ```
 
-The current model is designed as an MVP and detection performance can vary between civic issue categories and real-world images.
+The current model is designed as an MVP and detection performance can vary across civic issue categories and real-world images.
 
 ---
 
 # 🌟 Why AI Civic Guardian?
 
-AI Civic Guardian combines three important pieces into a single reporting workflow:
+AI Civic Guardian combines three important capabilities into a single reporting workflow:
 
 ```text
 AI Vision
@@ -606,23 +629,15 @@ GPS Location
 Structured Reporting
 ```
 
-Instead of asking citizens to manually identify and categorize every civic problem, the platform uses AI to assist with identification while automatically attaching the geographic location.
+Instead of asking citizens to manually identify and categorize every civic problem, the platform uses AI to assist with issue identification while allowing the citizen to attach a precise location and description.
 
 ---
 
 # 🌍 Vision
 
-The long-term vision of AI Civic Guardian is to create a scalable AI-assisted civic reporting platform that can help communities and municipal authorities understand infrastructure problems more efficiently.
+The long-term vision of AI Civic Guardian is to create a scalable AI-assisted civic reporting platform that helps communities and municipal authorities understand infrastructure problems more efficiently.
 
-The platform can evolve from a simple reporting tool into a complete civic intelligence system.
-
----
-
-# 🔗 Project Repository
-
-GitHub:
-
-https://github.com/kainatmoin/AI-Civic-Guardian
+The platform can evolve from a simple reporting tool into a broader civic intelligence system.
 
 ---
 
@@ -650,6 +665,18 @@ Project:
 
 ---
 
+# 🔗 Links
+
+### 🚨 Live Demo
+
+https://ai-civic-guardian-kryjzuyolzphxv7feqhxy4.streamlit.app/
+
+### 💻 GitHub Repository
+
+https://github.com/kainatmoin/AI-Civic-Guardian
+
+---
+
 ## 📌 Summary
 
 AI Civic Guardian provides a simple workflow:
@@ -667,7 +694,7 @@ AI Civic Guardian provides a simple workflow:
         ↓
 🚨 Submit Report
         ↓
-🗄️ Store in Database
+🆔 Receive Report ID
 ```
 
 **AI Civic Guardian — Making civic reporting smarter, faster, and more structured.**
