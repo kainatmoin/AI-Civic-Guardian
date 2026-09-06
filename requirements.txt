@@ -1,10 +1,6 @@
-fastapi
-uvicorn[standard]
-python-multipart
-sqlalchemy
-ultralytics
-torch
-torchvision
-opencv-python-headless
-numpy
-pillow
+streamlit>=1.40,<2
+ultralytics>=8.3,<9
+torch>=2.2,<3
+torchvision>=0.17,<1
+pillow>=10,<13
+streamlit-js-eval>=0.1.7,<2
